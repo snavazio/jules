@@ -49,7 +49,7 @@ if ( ! class_exists( 'PM_Custom_Post' ) ) {
             );
             $args = array(
                 'labels'            => $labels,
-                'public'            => false,
+                'public'            => true,
                 'show_ui'           => true,
                 'capability_type'   => array('prompt','prompts'),
                 'map_meta_cap'      => true,
