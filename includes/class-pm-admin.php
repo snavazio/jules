@@ -11,7 +11,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
         public function menus() {
             add_menu_page('Prompt Manager','Prompt Manager','edit_prompts','prompt-manager',array($this,'page_dashboard'));          
             add_submenu_page('prompt-manager','All Prompts','All Prompts','edit_prompts','edit.php?post_type=json_prompt');
-            add_submenu_page('prompt-manager','Add New','Add New','edit_prompts','prompt-new.php?post_type=json_prompt');
+            add_submenu_page('prompt-manager','Add New','Add New','edit_prompts','post-new.php?post_type=json_prompt');
             add_submenu_page('prompt-manager','Import','Import','edit_prompts','prompt-manager-import',array($this,'page_import'));
             add_submenu_page('prompt-manager','Export','Export','edit_prompts','prompt-manager-export',array($this,'page_export'));
             add_submenu_page('prompt-manager','Help','Help','edit_prompts','prompt-manager-help',array($this,'page_help'));

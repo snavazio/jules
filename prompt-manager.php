@@ -40,7 +40,7 @@ if ( ! class_exists( 'PM_Prompt_Manager' ) ) {
 
         private function includes() {
             $inc = PM_PLUGIN_DIR . 'includes/';
-            require_once $inc . 'class-pm-custom-prompt.php';
+            require_once $inc . 'class-pm-custom-post.php';
             require_once $inc . 'class-pm-admin.php';
             require_once $inc . 'class-pm-import-export.php';
             require_once $inc . 'class-pm-evaluator.php';
