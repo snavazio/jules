@@ -60,7 +60,18 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                             <tr>
                                 <th scope="row"><label for="json_content">JSON Content</label></th>
                                 <td>
-                                    <textarea name="json_content" id="json_content" rows="10" class="large-text"><?php echo $is_editing ? esc_textarea($prompt->json_content) : ''; ?></textarea>
+                            <textarea name="json_content" id="json_content" rows="10" class="large-text"><?php
+                                if ($is_editing) {
+                                    echo esc_textarea($prompt->json_content);
+                                } else {
+                                    echo esc_textarea(json_encode([
+                                        "context" => "You are a helpful assistant.",
+                                        "instructions" => "Translate the following English text to French.",
+                                        "input" => "Hello, world!",
+                                        "output" => ""
+                                    ], JSON_PRETTY_PRINT));
+                                }
+                            ?></textarea>
                                     <p class="description">Enter the JSON for your prompt.</p>
                                 </td>
                             </tr>
