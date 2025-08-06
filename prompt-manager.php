@@ -40,19 +40,40 @@ if ( ! class_exists( 'PM_Prompt_Manager' ) ) {
 
         private function includes() {
             $inc = PM_PLUGIN_DIR . 'includes/';
-            require_once $inc . 'class-pm-custom-post.php';
+            require_once $inc . 'class-pm-custom-post-legacy.php';
             require_once $inc . 'class-pm-admin.php';
+            require_once $inc . 'class-pm-prompts-list-table.php';
             require_once $inc . 'class-pm-import-export.php';
             require_once $inc . 'class-pm-evaluator.php';
         }
 
         private function init_hooks() {
-            register_activation_hook( __FILE__, array( 'PM_Custom_Post', 'activate' ) );
-            register_deactivation_hook( __FILE__, array( 'PM_Custom_Post', 'deactivate' ) );
-            add_action( 'init', array( 'PM_Custom_Post', 'register' ) );
+            register_activation_hook( __FILE__, array( 'PM_Prompt_Manager', 'activate' ) );
             if ( is_admin() ) {
                 new PM_Admin();
             }
+        }
+
+        public static function activate() {
+            self::create_table();
+        }
+
+        public static function create_table(){
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'pm_prompts';
+            $charset_collate = $wpdb->get_charset_collate();
+
+            $sql = "CREATE TABLE $table_name (
+                id bigint(20) NOT NULL AUTO_INCREMENT,
+                title text NOT NULL,
+                json_content longtext NOT NULL,
+                rating tinyint(1) NOT NULL DEFAULT 0,
+                created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY  (id)
+            ) $charset_collate;";
+
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
         }
     }
 
