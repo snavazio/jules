@@ -84,7 +84,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     </table>
                     <?php submit_button($is_editing ? 'Update Prompt' : 'Add Prompt'); ?>
                     <?php if($is_editing): ?>
-                        <button name="pm_action" value="save_as_new" class="button button-secondary">Save as New</button>
+                        <button name="pm_save_as_new" value="1" class="button button-secondary">Save as New</button>
                     <?php endif; ?>
                 </form>
             </div>
@@ -146,7 +146,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     wp_redirect('?page=prompt-manager&message=1');
                     exit;
                 }
-                if($_POST['pm_action'] == 'update_prompt'){
+                if($_POST['pm_action'] == 'update_prompt' && !isset($_POST['pm_save_as_new'])){
                     check_admin_referer('pm_update_prompt');
                     $wpdb->update($table_name, array(
                         'title' => sanitize_text_field($_POST['title']),
@@ -156,7 +156,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     wp_redirect('?page=prompt-manager&message=2');
                     exit;
                 }
-                if($_POST['pm_action'] == 'save_as_new'){
+                if(isset($_POST['pm_save_as_new'])){
                     check_admin_referer('pm_update_prompt'); // Nonce is the same as update
                     $wpdb->insert($table_name, array(
                         'title' => sanitize_text_field($_POST['title']) . ' (Copy)',
