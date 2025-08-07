@@ -83,6 +83,9 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                         </tbody>
                     </table>
                     <?php submit_button($is_editing ? 'Update Prompt' : 'Add Prompt'); ?>
+                    <?php if($is_editing): ?>
+                        <button name="pm_action" value="save_as_new" class="button button-secondary">Save as New</button>
+                    <?php endif; ?>
                 </form>
             </div>
             <?php
@@ -153,6 +156,16 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     wp_redirect('?page=prompt-manager&message=2');
                     exit;
                 }
+                if($_POST['pm_action'] == 'save_as_new'){
+                    check_admin_referer('pm_update_prompt'); // Nonce is the same as update
+                    $wpdb->insert($table_name, array(
+                        'title' => sanitize_text_field($_POST['title']) . ' (Copy)',
+                        'json_content' => wp_kses_post($_POST['json_content']),
+                        'rating' => absint($_POST['rating'])
+                    ));
+                    wp_redirect('?page=prompt-manager&message=5');
+                    exit;
+                }
                 if($_POST['pm_action'] == 'export_prompts'){
                     check_admin_referer('pm_export_prompts');
                     if(empty($_POST['prompt_ids'])){
@@ -217,6 +230,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     case 2: $text = 'Prompt updated successfully.'; break;
                     case 3: $text = 'Prompt deleted successfully.'; break;
                     case 4: $text = 'Prompts imported successfully.'; break;
+                    case 5: $text = 'Prompt saved as a new copy.'; break;
                 }
                 if(isset($_GET['page']) && $_GET['page'] == 'prompt-manager-import' && $message == 1){
                     $class = 'notice-error is-dismissible';
