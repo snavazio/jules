@@ -83,10 +83,13 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     </tr>
                         </tbody>
                     </table>
-                    <?php submit_button($is_editing ? 'Update Prompt' : 'Add Prompt'); ?>
-                    <?php if($is_editing): ?>
-                        <button name="pm_save_as_new" value="1" class="button button-secondary">Save as New</button>
-                    <?php endif; ?>
+                    <div class="submit">
+                        <?php submit_button($is_editing ? 'Update Prompt' : 'Add Prompt', 'primary', 'submit', false); ?>
+                        <?php if($is_editing): ?>
+                            <button name="pm_save_as_new" value="1" class="button button-secondary">Save as New</button>
+                            <a href="?page=prompt-manager" class="button button-secondary">Cancel</a>
+                        <?php endif; ?>
+                    </div>
                 </form>
             </div>
             <?php
