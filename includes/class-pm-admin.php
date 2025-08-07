@@ -160,7 +160,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     check_admin_referer('pm_update_prompt'); // Nonce is the same as update
                     $wpdb->insert($table_name, array(
                         'title' => sanitize_text_field($_POST['title']) . ' (Copy)',
-                        'json_content' => wp_kses_post($_POST['json_content']),
+                        'json_content' => wp_unslash($_POST['json_content']),
                         'rating' => absint($_POST['rating'])
                     ));
                     wp_redirect('?page=prompt-manager&message=5');
