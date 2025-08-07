@@ -15,10 +15,11 @@ class PM_Prompts_List_Table extends WP_List_Table {
 
     public function get_columns() {
         return [
-            'cb'         => '<input type="checkbox" />',
-            'title'      => 'Title',
-            'rating'     => 'Rating',
-            'created_at' => 'Date'
+            'cb'           => '<input type="checkbox" />',
+            'title'        => 'Title',
+            'json_content' => 'JSON Content',
+            'rating'       => 'Rating',
+            'created_at'   => 'Date'
         ];
     }
 
@@ -65,6 +66,8 @@ class PM_Prompts_List_Table extends WP_List_Table {
 
     public function column_default($item, $column_name) {
         switch ($column_name) {
+            case 'json_content':
+                return '<pre>' . esc_html(json_encode(json_decode($item[$column_name]), JSON_PRETTY_PRINT)) . '</pre>';
             case 'rating':
                 return str_repeat('&#9733;', absint($item['rating'])) . str_repeat('&#9734;', 5 - absint($item['rating']));
             case 'created_at':
