@@ -87,7 +87,22 @@ if ( ! class_exists( 'PM_Admin' ) ) {
             <?php
             wp_enqueue_code_editor(array('type' => 'application/json', 'codemirror' => array('autoRefresh' => true)));
         }
-        public function page_import(){ echo '<h1>Import</h1>'; }
+        public function page_import(){
+            ?>
+            <div class="wrap">
+                <h1>Import Prompts</h1>
+                <form method="post" enctype="multipart/form-data" action="">
+                    <input type="hidden" name="pm_action" value="import_prompts" />
+                    <?php wp_nonce_field('pm_import_prompts'); ?>
+                    <p>Select a JSON file to upload. The file should contain an array of objects, with each object having a "title" and a "json_content" key.</p>
+                    <p>
+                        <input type="file" name="import_file" />
+                    </p>
+                    <?php submit_button('Upload and Import'); ?>
+                </form>
+            </div>
+            <?php
+        }
         public function page_export(){
             global $wpdb;
             $table_name = $wpdb->prefix . 'pm_prompts';
@@ -151,6 +166,27 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     echo json_encode($prompts, JSON_PRETTY_PRINT);
                     exit;
                 }
+                if($_POST['pm_action'] == 'import_prompts'){
+                    check_admin_referer('pm_import_prompts');
+                    if(empty($_FILES['import_file']['tmp_name'])){
+                        wp_redirect('?page=prompt-manager-import&message=1');
+                        exit;
+                    }
+                    $json = file_get_contents($_FILES['import_file']['tmp_name']);
+                    $data = json_decode($json, true);
+                    if(is_array($data)){
+                        foreach($data as $prompt){
+                            if(isset($prompt['title']) && isset($prompt['json_content'])){
+                                $wpdb->insert($table_name, array(
+                                    'title' => sanitize_text_field($prompt['title']),
+                                    'json_content' => wp_kses_post(json_encode($prompt['json_content']))
+                                ));
+                            }
+                        }
+                    }
+                    wp_redirect('?page=prompt-manager&message=4');
+                    exit;
+                }
             }
 
             // Delete
@@ -171,6 +207,11 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     case 1: $text = 'Prompt added successfully.'; break;
                     case 2: $text = 'Prompt updated successfully.'; break;
                     case 3: $text = 'Prompt deleted successfully.'; break;
+                    case 4: $text = 'Prompts imported successfully.'; break;
+                }
+                if(isset($_GET['page']) && $_GET['page'] == 'prompt-manager-import' && $message == 1){
+                    $class = 'notice-error is-dismissible';
+                    $text = 'Please select a file to import.';
                 }
                 if($text){
                     printf('<div class="notice %s"><p>%s</p></div>', esc_attr($class), esc_html($text));
