@@ -6,6 +6,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
             add_action('admin_menu', array($this,'menus'));
             add_action('admin_init', array($this, 'handle_form_actions'));
             add_action('admin_notices', array($this, 'show_admin_notices'));
+            add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
         }
         public function menus() {
             add_menu_page('Prompt Manager','Prompt Manager','manage_options','prompt-manager',array($this,'page_dashboard'));
@@ -240,6 +241,13 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                     printf('<div class="notice %s"><p>%s</p></div>', esc_attr($class), esc_html($text));
                 }
             }
+        }
+
+        public function enqueue_assets($hook){
+            if(strpos($hook, 'prompt-manager') === false){
+                return;
+            }
+            wp_enqueue_script('pm-admin-js', PM_PLUGIN_URL . 'assets/js/admin.js', [], PM_PLUGIN_VERSION, true);
         }
     }
 }

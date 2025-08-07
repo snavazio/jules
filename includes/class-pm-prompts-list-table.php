@@ -84,7 +84,8 @@ class PM_Prompts_List_Table extends WP_List_Table {
     public function column_title($item) {
         $actions = [
             'edit'   => sprintf('<a href="?page=prompt-manager-new&id=%s">Edit</a>', $item['id']),
-            'delete' => sprintf('<a href="?page=%s&action=delete&id=%s&_wpnonce=%s">Delete</a>', $_REQUEST['page'], $item['id'], wp_create_nonce('pm_delete_prompt'))
+            'delete' => sprintf('<a href="?page=%s&action=delete&id=%s&_wpnonce=%s">Delete</a>', $_REQUEST['page'], $item['id'], wp_create_nonce('pm_delete_prompt')),
+            'use'    => sprintf('<a href="#" class="pm-use-prompt" data-json="%s">Use</a>', esc_attr($item['json_content']))
         ];
         return sprintf('%1$s %2$s', $item['title'], $this->row_actions($actions));
     }
