@@ -94,7 +94,7 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                 <form method="post" enctype="multipart/form-data" action="">
                     <input type="hidden" name="pm_action" value="import_prompts" />
                     <?php wp_nonce_field('pm_import_prompts'); ?>
-                    <p>Select a JSON file to upload. The file should contain an array of objects, with each object having a "title" and a "json_content" key.</p>
+                    <p>Select a JSON file to upload. The file should contain an array of objects, with each object having a "title" and a "json" key containing the prompt object.</p>
                     <p>
                         <input type="file" name="import_file" />
                     </p>
@@ -159,11 +159,18 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                         exit;
                     }
                     $prompt_ids = implode(',', array_map('absint', $_POST['prompt_ids']));
-                    $prompts = $wpdb->get_results("SELECT title, json_content FROM $table_name WHERE id IN ($prompt_ids)");
+                    $prompts = $wpdb->get_results("SELECT title, json_content FROM $table_name WHERE id IN ($prompt_ids)", ARRAY_A);
+
+                    $export_data = array_map(function($prompt){
+                        return [
+                            'title' => $prompt['title'],
+                            'json' => json_decode($prompt['json_content'])
+                        ];
+                    }, $prompts);
 
                     header('Content-Type: application/json');
                     header('Content-Disposition: attachment; filename=prompts-export.json');
-                    echo json_encode($prompts, JSON_PRETTY_PRINT);
+                    echo json_encode($export_data, JSON_PRETTY_PRINT);
                     exit;
                 }
                 if($_POST['pm_action'] == 'import_prompts'){
@@ -172,14 +179,15 @@ if ( ! class_exists( 'PM_Admin' ) ) {
                         wp_redirect('?page=prompt-manager-import&message=1');
                         exit;
                     }
-                    $json = file_get_contents($_FILES['import_file']['tmp_name']);
-                    $data = json_decode($json, true);
+                    $json_data = file_get_contents($_FILES['import_file']['tmp_name']);
+                    $data = json_decode($json_data, true);
+
                     if(is_array($data)){
                         foreach($data as $prompt){
-                            if(isset($prompt['title']) && isset($prompt['json_content'])){
+                            if(isset($prompt['title']) && isset($prompt['json'])){
                                 $wpdb->insert($table_name, array(
                                     'title' => sanitize_text_field($prompt['title']),
-                                    'json_content' => wp_kses_post(json_encode($prompt['json_content']))
+                                    'json_content' => wp_json_encode($prompt['json'])
                                 ));
                             }
                         }
